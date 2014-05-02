@@ -65,11 +65,11 @@ endif()
 
 # Android options
 if(SFML_OS_ANDROID)
-    # force usage of the STL port
-    set(ANDROID_USE_STLPORT TRUE)
+    # force usage of LLVM version of STL library
+    set(ANDROID_STL "c++")
 
     # make sure there's the android library available
-    if (${ANDROID_NATIVE_API_LEVEL} LESS 9)
+    if (${ANDROID_API_LEVEL} LESS 9)
         message(FATAL_ERROR "API level must be equal or greater than 9")
     endif()
 
@@ -79,10 +79,9 @@ if(SFML_OS_ANDROID)
     # we install libs in a subdirectory named after the ABI (lib/mips/*.so)
     set(LIB_SUFFIX "/${ANDROID_ABI}")
 
-    # this is a workaround to compile sfml-activity without stlport_shared as dependency
-    # we save the original compilation command line to restore it later in Macro.cmake
-    set(CMAKE_CXX_CREATE_SHARED_LIBRARY_WITH_STLPORT ${CMAKE_CXX_CREATE_SHARED_LIBRARY})
-    set(CMAKE_CXX_CREATE_SHARED_LIBRARY_WITHOUT_STLPORT "<CMAKE_CXX_COMPILER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+    # this is a workaround to compile sfml-activity without c++_shared as dependency
+    set(CMAKE_SHARED_LINKER_FLAGS_WITH_STL ${CMAKE_SHARED_LINKER_FLAGS})
+    string(REPLACE "-lc++_shared" "" CMAKE_SHARED_LINKER_FLAGS_WITHOUT_STL ${CMAKE_SHARED_LINKER_FLAGS})
 endif()
 
 # define SFML_STATIC if the build type is not set to 'shared'

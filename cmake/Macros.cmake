@@ -88,19 +88,16 @@ macro(sfml_add_library target)
     endif()
 
     # enable automatic reference counting on iOS
-    if (SFML_OS_IOS)
+    if(SFML_OS_IOS)
         set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
     endif()
 
-    # sfml-activity library is our bootstrap activity and must not depend on stlport_shared
-    # (otherwise Android will fail to load it)
-    if (SFML_OS_ANDROID)
+    # sfml-activity library is our bootstrap activity and must not depend on the STL library (otherwise android will fail to load it)
+    if(SFML_OS_ANDROID)
         if (${target} MATCHES "sfml-activity")
-            set_target_properties(${target} PROPERTIES COMPILE_FLAGS -fpermissive)
-            set_target_properties(${target} PROPERTIES LINK_FLAGS "-landroid -llog")
-            set(CMAKE_CXX_CREATE_SHARED_LIBRARY ${CMAKE_CXX_CREATE_SHARED_LIBRARY_WITHOUT_STLPORT})
+            set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_WITHOUT_STL})
         else()
-            set(CMAKE_CXX_CREATE_SHARED_LIBRARY ${CMAKE_CXX_CREATE_SHARED_LIBRARY_WITH_STLPORT})
+            set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_WITH_STL})
         endif()
     endif()
 
