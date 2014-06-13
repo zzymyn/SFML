@@ -60,7 +60,7 @@
 #        "14" - Correspond to Android 4.0 system images
 #        "18" - Correspond to Android 4.3 system images
 #
-#    ANDROID_VERSION="4.8" - Specifies compiler version
+#    ANDROID_COMPILER_VERSION="4.8" - Specifies compiler version
 #
 #      Possible values are:
 #        "4.6" - Use version 4.6 of GNU toolchains
@@ -95,8 +95,8 @@ endif()
 if(NOT DEFINED ANDROID_API_LEVEL)
     set(ANDROID_API_LEVEL 9)
 endif()
-if(NOT DEFINED ANDROID_VERSION)
-    set(ANDROID_VERSION "4.8")
+if(NOT DEFINED ANDROID_COMPILER_VERSION)
+    set(ANDROID_COMPILER_VERSION "4.8")
 endif()
 if(NOT DEFINED ANDROID_STL)
     set(ANDROID_STL "c++")
@@ -152,17 +152,17 @@ endif()
 # define the platform codename (according the host OS)
 if(CMAKE_HOST_WIN32)
     set(PLATFORM_CODENAME "windows")
-    if(NOT EXISTS "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_VERSION}/prebuilt/${PLATFORM_CODENAME}")
+    if(NOT EXISTS "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_COMPILER_VERSION}/prebuilt/${PLATFORM_CODENAME}")
         set(PLATFORM_CODENAME "windows-x86_64")
     endif()
 elseif(CMAKE_HOST_APPLE)
     set(PLATFORM_CODENAME "darwin-x86")
-    if(NOT EXISTS "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_VERSION}/prebuilt/${PLATFORM_CODENAME}")
+    if(NOT EXISTS "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_COMPILER_VERSION}/prebuilt/${PLATFORM_CODENAME}")
         set(PLATFORM_CODENAME "darwin-x86_64")
     endif()
 elseif(CMAKE_HOST_UNIX)
     set(PLATFORM_CODENAME "linux-x86")
-    if(NOT EXISTS "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_VERSION}/prebuilt/${PLATFORM_CODENAME}")
+    if(NOT EXISTS "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_COMPILER_VERSION}/prebuilt/${PLATFORM_CODENAME}")
         set(PLATFORM_CODENAME "linux-x86_64")
     endif()
 else()
@@ -170,7 +170,7 @@ else()
 endif()
 
 # define the compiler, sysroot and stl path
-set(COMPILER_PATH "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_VERSION}/prebuilt/${PLATFORM_CODENAME}/bin")
+set(COMPILER_PATH "${ANDROID_NDK}/toolchains/${COMPILER_CODENAME}-${ANDROID_COMPILER_VERSION}/prebuilt/${PLATFORM_CODENAME}/bin")
 set(SYSROOT_PATH  "${ANDROID_NDK}/platforms/android-${ANDROID_API_LEVEL}/arch-${ARCHITECTURE_NAME}")
 set(STL_PATH      "${ANDROID_NDK}/sources/cxx-stl/${STL_CODENAME}")
 
@@ -188,9 +188,9 @@ elseif(ANDROID_STL STREQUAL "stlport")
     set(STL_STATIC_LIBRARY "-lstlport_static")
     set(STL_SHARED_LIBRARY "-lstlport_shared")
 elseif(ANDROID_STL STREQUAL "gnustl")
-    include_directories("${STL_PATH}/${ANDROID_VERSION}/include")
-    include_directories("${STL_PATH}/${ANDROID_VERSION}/libs/${ANDROID_ABI}/include")
-    link_directories("${STL_PATH}/${ANDROID_VERSION}/libs/${ANDROID_ABI}")
+    include_directories("${STL_PATH}/${ANDROID_COMPILER_VERSION}/include")
+    include_directories("${STL_PATH}/${ANDROID_COMPILER_VERSION}/libs/${ANDROID_ABI}/include")
+    link_directories("${STL_PATH}/${ANDROID_COMPILER_VERSION}/libs/${ANDROID_ABI}")
     set(STL_STATIC_LIBRARY "-lgnustl_static")
     set(STL_SHARED_LIBRARY "-lgnustl_shared")
 elseif(ANDROID_STL STREQUAL "c++")
