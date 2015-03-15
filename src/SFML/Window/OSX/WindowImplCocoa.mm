@@ -543,6 +543,20 @@ void WindowImplCocoa::setMouseCursorVisible(bool visible)
 
 
 ////////////////////////////////////////////////////////////
+void WindowImplCocoa::setMouseCursor(Window::Cursor cursor)
+{
+    // TODO: Implement OS X cursor setting
+}
+
+
+////////////////////////////////////////////////////////////
+void WindowImplCocoa::setMouseCursor(const Uint8* pixels, unsigned int width, unsigned int height, Uint16 hotspotX, Uint16 hotspotY)
+{
+    // TODO: Implement OS X cursor setting
+}
+
+
+////////////////////////////////////////////////////////////
 void WindowImplCocoa::setKeyRepeatEnabled(bool enabled)
 {
     if (enabled)

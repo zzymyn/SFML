@@ -177,6 +177,20 @@ void WindowImplAndroid::setMouseCursorVisible(bool visible)
 
 
 ////////////////////////////////////////////////////////////
+void WindowImplAndroid::setMouseCursor(Window::Cursor cursor)
+{
+    // Not applicable
+}
+
+
+////////////////////////////////////////////////////////////
+void WindowImplAndroid::setMouseCursor(const Uint8* pixels, unsigned int width, unsigned int height, Uint16 hotspotX, Uint16 hotspotY)
+{
+    // Not applicable
+}
+
+
+////////////////////////////////////////////////////////////
 void WindowImplAndroid::setKeyRepeatEnabled(bool enabled)
 {
     // Not applicable

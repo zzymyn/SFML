@@ -25,8 +25,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include <SFML/Window/Unix/WindowImplX11.hpp> // important to be included first (conflict with None)
 #include <SFML/Window/Unix/GlxContext.hpp>
-#include <SFML/Window/Unix/WindowImplX11.hpp>
 #include <SFML/Window/Unix/Display.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/System/Err.hpp>
@@ -376,7 +376,7 @@ void GlxContext::createContext(GlxContext* shared, unsigned int bitsPerPixel, co
     int depth, stencil, multiSampling, samples;
     glXGetConfig(m_display, bestVisual, GLX_DEPTH_SIZE,         &depth);
     glXGetConfig(m_display, bestVisual, GLX_STENCIL_SIZE,       &stencil);
-    glXGetConfig(m_display, bestVisual, GLX_SAMPLE_BUFFERS_ARB, &multiSampling);        
+    glXGetConfig(m_display, bestVisual, GLX_SAMPLE_BUFFERS_ARB, &multiSampling);
     glXGetConfig(m_display, bestVisual, GLX_SAMPLES_ARB,        &samples);
     m_settings.depthBits         = static_cast<unsigned int>(depth);
     m_settings.stencilBits       = static_cast<unsigned int>(stencil);
