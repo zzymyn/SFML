@@ -32,18 +32,12 @@
 #include <SFML/System/Export.hpp>
 #include <SFML/System/InputStream.hpp>
 #include <SFML/System/NonCopyable.hpp>
+#ifdef SFML_SYSTEM_ANDROID
+    #include <android/asset_manager.h>
+#endif
 #include <cstdio>
 #include <string>
 
-#ifdef ANDROID
-namespace sf
-{
-namespace priv
-{
-class SFML_SYSTEM_API ResourceStream;
-}
-}
-#endif
 
 
 namespace sf
@@ -122,8 +116,8 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-#ifdef ANDROID
-    sf::priv::ResourceStream *m_file;
+#ifdef SFML_SYSTEM_ANDROID
+    AAsset* m_file; ///< asset file to read
 #else
     std::FILE* m_file; ///< stdio file stream
 #endif

@@ -338,9 +338,6 @@ private:
     Info                       m_info;        ///< Information about the font
     mutable PageTable          m_pages;       ///< Table containing the glyphs pages by character size
     mutable std::vector<Uint8> m_pixelBuffer; ///< Pixel buffer holding a glyph's pixels before being written to the texture
-    #ifdef SFML_SYSTEM_ANDROID
-    void*                      m_stream; ///< Asset file streamer (if loaded from file)
-    #endif
 };
 
 } // namespace sf

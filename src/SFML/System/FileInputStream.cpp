@@ -26,8 +26,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/System/FileInputStream.hpp>
-#ifdef ANDROID
-#include <SFML/System/Android/ResourceStream.hpp>
+#ifdef SFML_SYSTEM_ANDROID
+    #include <SFML/System/Lock.hpp>
+    #include <SFML/System/Android/Activity.hpp>
 #endif
 
 
@@ -44,9 +45,9 @@ FileInputStream::FileInputStream()
 ////////////////////////////////////////////////////////////
 FileInputStream::~FileInputStream()
 {
-#ifdef ANDROID
+#ifdef SFML_SYSTEM_ANDROID
     if (m_file)
-        delete m_file;
+        AAsset_close(m_file);
 #else
     if (m_file)
         std::fclose(m_file);
@@ -57,10 +58,19 @@ FileInputStream::~FileInputStream()
 ////////////////////////////////////////////////////////////
 bool FileInputStream::open(const std::string& filename)
 {
-#ifdef ANDROID
+#ifdef SFML_SYSTEM_ANDROID
+    priv::ActivityStates* states = priv::getActivity(NULL);
+    Lock(states->mutex);
+
     if (m_file)
-        delete m_file;
-    m_file = new sf::priv::ResourceStream(filename);
+    {
+        AAsset_close(m_file);
+        m_file = NULL;
+    }
+
+    m_file = AAssetManager_open(states->activity->assetManager, filename.c_str(), AASSET_MODE_UNKNOWN);
+
+    return m_file != NULL;
 #else
     if (m_file)
         std::fclose(m_file);
@@ -75,8 +85,11 @@ bool FileInputStream::open(const std::string& filename)
 ////////////////////////////////////////////////////////////
 Int64 FileInputStream::read(void* data, Int64 size)
 {
-#ifdef ANDROID
-    return m_file->read(data, size);
+#ifdef SFML_SYSTEM_ANDROID
+    if (m_file)
+        return AAsset_read(m_file, data, size);
+    else
+        return -1;
 #else
     if (m_file)
         return std::fread(data, 1, static_cast<std::size_t>(size), m_file);
@@ -89,8 +102,11 @@ Int64 FileInputStream::read(void* data, Int64 size)
 ////////////////////////////////////////////////////////////
 Int64 FileInputStream::seek(Int64 position)
 {
-#ifdef ANDROID
-    return m_file->seek(position);
+#ifdef SFML_SYSTEM_ANDROID
+    if (m_file)
+        AAsset_seek(m_file, position, SEEK_SET);
+    else
+        return -1;
 #else
     if (m_file)
     {
@@ -108,8 +124,11 @@ Int64 FileInputStream::seek(Int64 position)
 ////////////////////////////////////////////////////////////
 Int64 FileInputStream::tell()
 {
-#ifdef ANDROID
-    return m_file->tell();
+#ifdef SFML_SYSTEM_ANDROID
+    if (m_file)
+        return getSize() - AAsset_getRemainingLength(m_file);
+    else
+        return -1;
 #else
     if (m_file)
         return std::ftell(m_file);
@@ -122,8 +141,11 @@ Int64 FileInputStream::tell()
 ////////////////////////////////////////////////////////////
 Int64 FileInputStream::getSize()
 {
-#ifdef ANDROID
-    return m_file->getSize();
+#ifdef SFML_SYSTEM_ANDROID
+    if (m_file)
+        return AAsset_getLength(m_file);
+    else
+        return -1;
 #else
     if (m_file)
     {
