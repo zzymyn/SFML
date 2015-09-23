@@ -100,6 +100,7 @@
     #define GLEXT_glCheckFramebufferStatus            glCheckFramebufferStatusOES
     #define GLEXT_glFramebufferTexture2D              glFramebufferTexture2DOES
     #define GLEXT_glFramebufferRenderbuffer           glFramebufferRenderbufferOES
+    #define GLEXT_glGenerateMipmap                    glGenerateMipmapOES
     #define GLEXT_GL_FRAMEBUFFER                      GL_FRAMEBUFFER_OES
     #define GLEXT_GL_RENDERBUFFER                     GL_RENDERBUFFER_OES
     #define GLEXT_GL_DEPTH_COMPONENT                  GL_DEPTH_COMPONENT16_OES
@@ -209,6 +210,7 @@
     #define GLEXT_glCheckFramebufferStatus            glCheckFramebufferStatusEXT
     #define GLEXT_glFramebufferTexture2D              glFramebufferTexture2DEXT
     #define GLEXT_glFramebufferRenderbuffer           glFramebufferRenderbufferEXT
+    #define GLEXT_glGenerateMipmap                    glGenerateMipmapEXT
     #define GLEXT_GL_FRAMEBUFFER                      GL_FRAMEBUFFER_EXT
     #define GLEXT_GL_RENDERBUFFER                     GL_RENDERBUFFER_EXT
     #define GLEXT_GL_COLOR_ATTACHMENT0                GL_COLOR_ATTACHMENT0_EXT
