@@ -43,6 +43,10 @@
 
 #endif
 
+#if !defined(GL_MAJOR_VERSION)
+    #define GL_MAJOR_VERSION 0x821B
+#endif
+
 #if !defined(GL_NUM_EXTENSIONS)
     #define GL_NUM_EXTENSIONS 0x821D
 #endif
@@ -113,14 +117,15 @@ bool Context::isExtensionAvailable(const char* name)
 
     if (!loaded)
     {
-        const Context* context = getActiveContext();
-
-        if (!context)
-            return false;
+        TransientContextLock lock;
 
         const char* extensionString = NULL;
 
-        if(context->getSettings().majorVersion < 3)
+        // Check whether a >= 3.0 context is available
+        int majorVersion = 0;
+        glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+
+        if (glGetError() == GL_INVALID_ENUM)
         {
             // Try to load the < 3.0 way
             extensionString = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));

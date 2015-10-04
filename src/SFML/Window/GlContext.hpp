@@ -73,10 +73,16 @@ public:
     static void globalCleanup();
 
     ////////////////////////////////////////////////////////////
-    /// \brief Ensures that an OpenGL context is active in the current thread
+    /// \brief Acquires a context for short-term use on the current thread
     ///
     ////////////////////////////////////////////////////////////
-    static void ensureContext();
+    static void acquireTransientContext();
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Releases a context after short-term use on the current thread
+    ///
+    ////////////////////////////////////////////////////////////
+    static void releaseTransientContext();
 
     ////////////////////////////////////////////////////////////
     /// \brief Create a new context, not associated to a window
@@ -197,10 +203,12 @@ protected:
     /// \brief Activate the context as the current target
     ///        for rendering
     ///
+    /// \param current Whether to make the context current or no longer current
+    ///
     /// \return True on success, false if any error happened
     ///
     ////////////////////////////////////////////////////////////
-    virtual bool makeCurrent() = 0;
+    virtual bool makeCurrent(bool current) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Evaluate a pixel format configuration

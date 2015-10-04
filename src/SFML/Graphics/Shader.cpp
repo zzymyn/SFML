@@ -116,39 +116,6 @@ namespace
         return success;
     }
 
-    bool checkShadersAvailable()
-    {
-        // Create a temporary context in case the user checks
-        // before a GlResource is created, thus initializing
-        // the shared context
-        if (!sf::Context::getActiveContext())
-        {
-            sf::Context context;
-
-            // Make sure that extensions are initialized
-            sf::priv::ensureExtensionsInit();
-
-            bool available = GLEXT_multitexture         &&
-                             GLEXT_shading_language_100 &&
-                             GLEXT_shader_objects       &&
-                             GLEXT_vertex_shader        &&
-                             GLEXT_fragment_shader;
-
-            return available;
-        }
-
-        // Make sure that extensions are initialized
-        sf::priv::ensureExtensionsInit();
-
-        bool available = GLEXT_multitexture         &&
-                         GLEXT_shading_language_100 &&
-                         GLEXT_shader_objects       &&
-                         GLEXT_vertex_shader        &&
-                         GLEXT_fragment_shader;
-
-        return available;
-    }
-
     // Transforms an array of 2D vectors into a contiguous array of scalars
     template <typename T>
     std::vector<T> flatten(const sf::Vector2<T>* vectorArray, std::size_t length)
@@ -222,8 +189,6 @@ struct Shader::UniformBinder : private NonCopyable
     {
         if (currentProgram)
         {
-            ensureGlContext();
-
             // Enable program object
             glCheck(savedProgram = GLEXT_glGetHandle(GLEXT_GL_PROGRAM_OBJECT));
             if (currentProgram != savedProgram)
@@ -245,9 +210,10 @@ struct Shader::UniformBinder : private NonCopyable
             glCheck(GLEXT_glUseProgramObject(savedProgram));
     }
 
-    GLEXT_GLhandle savedProgram;   ///< Handle to the previously active program object
-    GLEXT_GLhandle currentProgram; ///< Handle to the program object of the modified sf::Shader instance
-    GLint          location;       ///< Uniform location, used by the surrounding sf::Shader code
+    TransientContextLock lock;           ///< Lock to keep context active while uniform is bound
+    GLEXT_GLhandle       savedProgram;   ///< Handle to the previously active program object
+    GLEXT_GLhandle       currentProgram; ///< Handle to the program object of the modified sf::Shader instance
+    GLint                location;       ///< Uniform location, used by the surrounding sf::Shader code
 };
 
 
@@ -264,7 +230,7 @@ m_uniforms      ()
 ////////////////////////////////////////////////////////////
 Shader::~Shader()
 {
-    ensureGlContext();
+    TransientContextLock lock;
 
     // Destroy effect program
     if (m_shaderProgram)
@@ -500,7 +466,7 @@ void Shader::setUniform(const std::string& name, const Texture& texture)
 {
     if (m_shaderProgram)
     {
-        ensureGlContext();
+        TransientContextLock lock;
 
         // Find the location of the variable in the shader
         int location = getUniformLocation(name);
@@ -535,7 +501,7 @@ void Shader::setUniform(const std::string& name, CurrentTextureType)
 {
     if (m_shaderProgram)
     {
-        ensureGlContext();
+        TransientContextLock lock;
 
         // Find the location of the variable in the shader
         m_currentTexture = getUniformLocation(name);
@@ -695,7 +661,7 @@ unsigned int Shader::getNativeHandle() const
 ////////////////////////////////////////////////////////////
 void Shader::bind(const Shader* shader)
 {
-    ensureGlContext();
+    TransientContextLock lock;
 
     // Make sure that we can use shaders
     if (!isAvailable())
@@ -728,10 +694,26 @@ void Shader::bind(const Shader* shader)
 ////////////////////////////////////////////////////////////
 bool Shader::isAvailable()
 {
-    // TODO: Remove this lock when it becomes unnecessary in C++11
     Lock lock(mutex);
 
-    static bool available = checkShadersAvailable();
+    static bool checked = false;
+    static bool available = false;
+
+    if (!checked)
+    {
+        checked = true;
+
+        TransientContextLock contextLock;
+
+        // Make sure that extensions are initialized
+        sf::priv::ensureExtensionsInit();
+
+        available = GLEXT_multitexture         &&
+                    GLEXT_shading_language_100 &&
+                    GLEXT_shader_objects       &&
+                    GLEXT_vertex_shader        &&
+                    GLEXT_fragment_shader;
+    }
 
     return available;
 }
@@ -740,7 +722,7 @@ bool Shader::isAvailable()
 ////////////////////////////////////////////////////////////
 bool Shader::compile(const char* vertexShaderCode, const char* fragmentShaderCode)
 {
-    ensureGlContext();
+    TransientContextLock lock;
 
     // First make sure that we can use shaders
     if (!isAvailable())
