@@ -46,24 +46,30 @@ namespace priv
 ////////////////////////////////////////////////////////////
 Time ClockImpl::getCurrentTime()
 {
-    // Force the following code to run on first core
-    // (see http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx)
-    HANDLE currentThread = GetCurrentThread();
-    DWORD_PTR previousMask = SetThreadAffinityMask(currentThread, 1);
-
     // Get the frequency of the performance counter
     // (it is constant across the program lifetime)
     static LARGE_INTEGER frequency = getFrequency();
 
+    // On Windows XP or older, timer inconsistencies might
+    // return an earlier time on consecutive calls to the
+    // performance counter.
+    // Let's store the previous time to ensure we don't
+    // time travel in some way, since the measured times
+    // are defined as being monotonic (non-decreasing).
+    static sf::Int64 previous = 0;
+
     // Get the current time
     LARGE_INTEGER time;
     QueryPerformanceCounter(&time);
+    sf::Int64 now = 1000000 * time.QuadPart / frequency.QuadPart;
 
-    // Restore the thread affinity
-    SetThreadAffinityMask(currentThread, previousMask);
+    if (now < previous) // Did we time travel?
+        now = previous; // If so, let's go back to the future.
+    else
+        previous = now; // Otherwise, store this time.
 
     // Return the current time as microseconds
-    return sf::microseconds(1000000 * time.QuadPart / frequency.QuadPart);
+    return sf::microseconds(now);
 }
 
 } // namespace priv
