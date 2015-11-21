@@ -33,7 +33,7 @@ int main()
     if (!font.loadFromFile("resources/sansation.ttf"))
         return EXIT_FAILURE;
     sf::Text text("SFML / OpenGL demo", font);
-    text.setColor(sf::Color(255, 255, 255, 170));
+    text.setFillColor(sf::Color(255, 255, 255, 170));
     text.setPosition(250.f, 450.f);
 
     // Load an OpenGL texture.
