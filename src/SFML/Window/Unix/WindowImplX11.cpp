@@ -34,7 +34,6 @@
 #include <SFML/System/Err.hpp>
 #include <SFML/System/Mutex.hpp>
 #include <SFML/System/Lock.hpp>
-#include <xcb/xcb_image.h>
 #include <xcb/randr.h>
 #include <X11/Xlibint.h>
 #include <sys/types.h>
@@ -855,24 +854,12 @@ void WindowImplX11::setIcon(unsigned int width, unsigned int height, const Uint8
         }
     }
 
-    xcb_pixmap_t maskPixmap = xcb_create_pixmap_from_bitmap_data(
-        m_connection,
-        m_window,
-        reinterpret_cast<uint8_t*>(&maskPixels[0]),
-        width,
-        height,
-        1,
-        0,
-        1,
-        NULL
-    );
-
     // Send our new icon to the window through the WMHints
     WMHints hints;
     std::memset(&hints, 0, sizeof(hints));
     hints.flags      |= ((1 << 2) | (1 << 5));
     hints.icon_pixmap = iconPixmap;
-    hints.icon_mask   = maskPixmap;
+    hints.icon_mask   = 0;
 
     setWMHints(hints);
 
